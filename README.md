@@ -26,3 +26,7 @@ void showCityPicker() {
 }
 
 ```
+
+![home](images/home.png)
+
+![picker](images/picker.png)
