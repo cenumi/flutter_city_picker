@@ -1,6 +1,6 @@
 name: city_picker_china
 description: Flutter china city picker, use the dataset from baidu map updated on 202104.
-version: 0.0.1
+version: 0.0.2
 homepage: 'https://github.com/cenumi/flutter_city_picker'
 
 environment:
