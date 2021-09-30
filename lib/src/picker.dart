@@ -26,8 +26,7 @@ class CityResult {
   });
 
   @override
-  String toString() =>
-      '$province${city == null ? '' : ',$city'}${county == null ? '' : ',$county'}';
+  String toString() => '$province${city == null ? '' : ',$city'}${county == null ? '' : ',$county'}';
 }
 
 class CityPicker extends StatefulWidget {
@@ -55,9 +54,8 @@ class CityPicker extends StatefulWidget {
 
   /// data set from baidu 202104
   /// rootBundle.loadStructuredData will cache the result so no worries
-  static Future<List<dynamic>> loadAssets() => rootBundle.loadStructuredData(
-      'packages/city_picker/assets/data_202104.json',
-      (str) async => jsonDecode(str));
+  static Future<List<dynamic>> loadAssets() =>
+      rootBundle.loadStructuredData('packages/city_picker/assets/data_202104.json', (str) async => jsonDecode(str));
 
   static Future<CityResult?> searchWithCode(
     String? code, {
@@ -75,18 +73,13 @@ class CityPicker extends StatefulWidget {
       }
       for (final city in province[_nameChildren]) {
         if (city[_nameCode] == code) {
-          return CityResult(
-              code: code, province: province[_nameName], city: city[_nameName]);
+          return CityResult(code: code, province: province[_nameName], city: city[_nameName]);
         }
 
         for (final county in city[_nameChildren]) {
           if (county[_nameCode] == code) {
             return CityResult(
-              code: code,
-              province: province[_nameName],
-              city: city[_nameName],
-              county: county[_nameName],
-            );
+                code: code, province: province[_nameName], city: city[_nameName], county: county[_nameName]);
           }
         }
       }
@@ -106,8 +99,7 @@ class CityPicker extends StatefulWidget {
 
     final provinces = dataSet ?? await loadAssets();
 
-    final provinceInfo =
-        provinces.firstWhereOrNull((element) => element[_nameName] == province);
+    final provinceInfo = provinces.firstWhereOrNull((element) => element[_nameName] == province);
 
     if (provinceInfo == null) {
       return null;
@@ -115,8 +107,7 @@ class CityPicker extends StatefulWidget {
 
     final cityInfo = city == null
         ? null
-        : (provinceInfo[_nameChildren] as List<dynamic>)
-            .firstWhereOrNull((element) => element[_nameName] == city);
+        : (provinceInfo[_nameChildren] as List<dynamic>).firstWhereOrNull((element) => element[_nameName] == city);
 
     if (cityInfo == null) {
       return CityResult(code: provinceInfo[_nameCode], province: province);
@@ -124,19 +115,13 @@ class CityPicker extends StatefulWidget {
 
     final countyInfo = city == null
         ? null
-        : (cityInfo[_nameChildren] as List<dynamic>)
-            .firstWhereOrNull((element) => element[_nameName] == county);
+        : (cityInfo[_nameChildren] as List<dynamic>).firstWhereOrNull((element) => element[_nameName] == county);
 
     if (countyInfo == null) {
-      return CityResult(
-          code: cityInfo[_nameCode], province: province, city: city);
+      return CityResult(code: cityInfo[_nameCode], province: province, city: city);
     }
 
-    return CityResult(
-        code: countyInfo[_nameCode],
-        province: province,
-        city: city,
-        county: county);
+    return CityResult(code: countyInfo[_nameCode], province: province, city: city, county: county);
   }
 
   @override
@@ -163,11 +148,7 @@ class _CityPickerState extends State<CityPicker> {
       final result = widget.code != null
           ? await CityPicker.searchWithCode(widget.code!, dataSet: _data)
           : await CityPicker.searchWithName(
-              province: widget.province,
-              city: widget.city,
-              county: widget.county,
-              dataSet: _data,
-            );
+              province: widget.province, city: widget.city, county: widget.county, dataSet: _data);
 
       int indexProvince = 0;
       int indexCity = 0;
@@ -190,8 +171,7 @@ class _CityPickerState extends State<CityPicker> {
         return name;
       }).toList();
 
-      final dataCounties = _data![indexProvince][_nameChildren][indexCity]
-          [_nameChildren] as List<dynamic>;
+      final dataCounties = _data![indexProvince][_nameChildren][indexCity][_nameChildren] as List<dynamic>;
       _counties = dataCounties.mapIndexed<String>((index, element) {
         final name = element[_nameName];
         if (name == result?.county) {
@@ -219,14 +199,13 @@ class _CityPickerState extends State<CityPicker> {
   }
 
   void updateCities() {
-    final list = _data![_provinceController.selectedItem][_nameChildren]
-        as List<dynamic>;
+    final list = _data![_provinceController.selectedItem][_nameChildren] as List<dynamic>;
     _cities = list.map<String>((e) => e[_nameName]).toList();
   }
 
   void updateCounties() {
-    final list = _data![_provinceController.selectedItem][_nameChildren]
-        [_cityController.selectedItem][_nameChildren] as List<dynamic>;
+    final list = _data![_provinceController.selectedItem][_nameChildren][_cityController.selectedItem][_nameChildren]
+        as List<dynamic>;
     _counties = list.map<String>((e) => e[_nameName]).toList();
   }
 
@@ -237,10 +216,7 @@ class _CityPickerState extends State<CityPicker> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CupertinoButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
+            CupertinoButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
             CupertinoButton(
               onPressed: () {
                 CityResult? result;
@@ -252,8 +228,7 @@ class _CityPickerState extends State<CityPicker> {
                   final indexCounty = _countyController.selectedItem;
 
                   result = CityResult(
-                    code: _data![indexProvince][_nameChildren][indexCity]
-                        [_nameChildren][indexCounty][_nameCode],
+                    code: _data![indexProvince][_nameChildren][indexCity][_nameChildren][indexCounty][_nameCode],
                     province: _provinces![indexProvince],
                     city: _cities![indexCity],
                     county: _counties![indexCounty],

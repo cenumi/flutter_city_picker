@@ -1,4 +1,4 @@
-name: city_picker
+name: city_picker_china
 description: flutter china city picker
 version: 0.0.1
 homepage: 'https://github.com/cenumi/flutter_city_picker'
@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  collection: ^1.15.0
+  
 
 dev_dependencies:
   flutter_test:
