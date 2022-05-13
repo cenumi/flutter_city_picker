@@ -78,11 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    super.dispose();
     codeController.dispose();
     provinceController.dispose();
     cityController.dispose();
     countyController.dispose();
+    super.dispose();
   }
 
   @override

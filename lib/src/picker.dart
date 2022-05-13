@@ -13,11 +13,6 @@ const _nameName = 'name';
 
 /// The result object returned by Navigator
 class CityResult {
-  final String code;
-  final String province;
-  final String? city;
-  final String? county;
-
   const CityResult({
     required this.code,
     required this.province,
@@ -25,9 +20,40 @@ class CityResult {
     this.county,
   });
 
+  final String code;
+  final String province;
+  final String? city;
+  final String? county;
+
   @override
-  String toString() =>
-      '$province${city == null ? '' : ',$city'}${county == null ? '' : ',$county'}';
+  String toString() {
+    return '$province${city == null ? '' : ',$city'}${county == null ? '' : ',$county'}';
+  }
+}
+
+/// Data object for serialization
+class CityNode {
+  CityNode(this.name, this.code, [this.children]);
+
+  final String name;
+  final String code;
+  final List<CityNode>? children;
+
+  factory CityNode.fromJson(Map<String, dynamic> json) {
+    final leaf = json[_nameChildren] == null;
+
+    return CityNode(
+      json[_nameName] as String,
+      json[_nameCode] as String,
+      leaf ? null : fromJsonList(json[_nameChildren] as List<dynamic>),
+    );
+  }
+
+  static List<CityNode> fromJsonList(List<dynamic> list) {
+    return list
+        .map((e) => CityNode.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 }
 
 /// The picker widget
@@ -62,23 +88,31 @@ class CityPicker extends StatefulWidget {
         county = null,
         super(key: key);
 
-  /// the city code, e.g. 110111
+  /// The city code, e.g. 110111
   final String? code;
 
-  /// the province name, e.g. 北京市
+  /// The province name, e.g. 北京市
   final String? province;
 
-  /// the city name, e.g. 北京市
+  /// The city name, e.g. 北京市
   final String? city;
 
-  /// the county name, e.g. 房山区
+  /// The county name, e.g. 房山区
   final String? county;
 
-  /// data set from baidu 202104
+  /// Data set from baidu 202104
   /// rootBundle.loadStructuredData will cache the result so no worries
-  static Future<List<dynamic>> loadAssets() => rootBundle.loadStructuredData(
+  static Future<List<dynamic>> loadAssets() {
+    return rootBundle.loadStructuredData(
       'packages/city_picker_china/assets/data_202104.json',
-      (str) async => jsonDecode(str));
+      (str) async => jsonDecode(str),
+    );
+  }
+
+  /// Convert the data set to structured data
+  static Future<List<CityNode>> loadCityNodes() async {
+    return CityNode.fromJsonList(await loadAssets());
+  }
 
   /// Search city infomation by code
   ///
@@ -100,16 +134,20 @@ class CityPicker extends StatefulWidget {
       for (final city in province[_nameChildren]) {
         if (city[_nameCode] == code) {
           return CityResult(
-              code: code, province: province[_nameName], city: city[_nameName]);
+            code: code,
+            province: province[_nameName],
+            city: city[_nameName],
+          );
         }
 
         for (final county in city[_nameChildren]) {
           if (county[_nameCode] == code) {
             return CityResult(
-                code: code,
-                province: province[_nameName],
-                city: city[_nameName],
-                county: county[_nameName]);
+              code: code,
+              province: province[_nameName],
+              city: city[_nameName],
+              county: county[_nameName],
+            );
           }
         }
       }
@@ -133,8 +171,9 @@ class CityPicker extends StatefulWidget {
 
     final provinces = dataSet ?? await loadAssets();
 
-    final provinceInfo =
-        provinces.firstWhereOrNull((element) => element[_nameName] == province);
+    final provinceInfo = provinces.firstWhereOrNull(
+      (element) => element[_nameName] == province,
+    );
 
     if (provinceInfo == null) {
       return null;
@@ -142,8 +181,9 @@ class CityPicker extends StatefulWidget {
 
     final cityInfo = (city == null || city.isEmpty)
         ? null
-        : (provinceInfo[_nameChildren] as List<dynamic>)
-            .firstWhereOrNull((element) => element[_nameName] == city);
+        : (provinceInfo[_nameChildren] as List<dynamic>).firstWhereOrNull(
+            (element) => element[_nameName] == city,
+          );
 
     if (cityInfo == null) {
       return CityResult(code: provinceInfo[_nameCode], province: province);
@@ -151,23 +191,28 @@ class CityPicker extends StatefulWidget {
 
     final countyInfo = (county == null || county.isEmpty)
         ? null
-        : (cityInfo[_nameChildren] as List<dynamic>)
-            .firstWhereOrNull((element) => element[_nameName] == county);
+        : (cityInfo[_nameChildren] as List<dynamic>).firstWhereOrNull(
+            (element) => element[_nameName] == county,
+          );
 
     if (countyInfo == null) {
       return CityResult(
-          code: cityInfo[_nameCode], province: province, city: city);
+        code: cityInfo[_nameCode],
+        province: province,
+        city: city,
+      );
     }
 
     return CityResult(
-        code: countyInfo[_nameCode],
-        province: province,
-        city: city,
-        county: county);
+      code: countyInfo[_nameCode],
+      province: province,
+      city: city,
+      county: county,
+    );
   }
 
   @override
-  _CityPickerState createState() => _CityPickerState();
+  State<CityPicker> createState() => _CityPickerState();
 }
 
 class _CityPickerState extends State<CityPicker> {
@@ -193,7 +238,8 @@ class _CityPickerState extends State<CityPicker> {
               province: widget.province,
               city: widget.city,
               county: widget.county,
-              dataSet: _data);
+              dataSet: _data,
+            );
 
       int indexProvince = 0;
       int indexCity = 0;
@@ -228,7 +274,7 @@ class _CityPickerState extends State<CityPicker> {
 
       setState(() {});
 
-      SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
         _provinceController.jumpToItem(indexProvince);
         _cityController.jumpToItem(indexCity);
         _countyController.jumpToItem(indexCounty);
@@ -238,10 +284,10 @@ class _CityPickerState extends State<CityPicker> {
 
   @override
   void dispose() {
-    super.dispose();
     _provinceController.dispose();
     _cityController.dispose();
     _countyController.dispose();
+    super.dispose();
   }
 
   void _updateCities() {
