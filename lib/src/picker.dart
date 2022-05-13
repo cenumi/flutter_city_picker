@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:collection/collection.dart';
@@ -304,15 +305,18 @@ class _CityPickerState extends State<CityPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = MaterialLocalizations.of(context);
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CupertinoButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('取消')),
-            CupertinoButton(
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(localization.cancelButtonLabel),
+            ),
+            TextButton(
               onPressed: () {
                 CityResult? result;
                 if (_data == null) {
@@ -332,7 +336,7 @@ class _CityPickerState extends State<CityPicker> {
                 }
                 Navigator.pop(context, result);
               },
-              child: const Text('确定'),
+              child: Text(localization.okButtonLabel),
             ),
           ],
         ),
