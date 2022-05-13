@@ -309,8 +309,8 @@ class _CityPickerState extends State<CityPicker> {
 
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        ButtonBar(
+          alignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton(
               onPressed: () => Navigator.pop(context),

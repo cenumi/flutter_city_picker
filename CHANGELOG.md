@@ -7,7 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.0] - 2022-05-13
 
-- upgrade to Flutter 3
+- Upgrade to Flutter 3
+- Replace hardcoded text with localization support
 
 ## [0.0.2] - 2021-09-30
 
